@@ -53,16 +53,16 @@ class LoanApplication(BaseModel):
     Existing_Loans: int = 0
     Total_Existing_Loan_Amount: int = 0
     Outstanding_Debt: int = 0
-    Loan_History: str = ""
+    Loan_History: int = 0
     Loan_Amount_Requested: int = 0
     Loan_Term: int = 0
     Loan_Purpose: str = ""
     Interest_Rate: float = 0.0
     Loan_Type: str = ""
     Co_Applicant: str = ""
-    Bank_Account_History: str = ""
-    Transaction_Frequency: str = ""
-    Default_Risk: str = ""
+    Bank_Account_History: int = 0
+    Transaction_Frequency: int = 0
+    Default_Risk: float = 0.0
 
 @app.post("/predict")
 async def predict_loan(application: LoanApplication):
@@ -102,7 +102,7 @@ async def predict_loan(application: LoanApplication):
         binary_mappings = {
             'Gender': {'Female': 0, 'Male': 1, 'Other': 2},
             'Marital_Status': {'Married': 0, 'Single': 1},
-            'Education': {'Graduate': 0, 'Not Graduate': 1},
+            'Education': {'Graduate': 0, 'High School': 1, 'Postgraduate': 2},
             'Loan_Type': {'Secured': 0, 'Unsecured': 1},
             'Co-Applicant': {'No': 0, 'Yes': 1}
         }
@@ -114,13 +114,7 @@ async def predict_loan(application: LoanApplication):
         nominal_cols = ['Employment_Status', 'Occupation_Type', 'Residential_Status', 'City/Town', 'Loan_Purpose']
         df = pd.get_dummies(df, columns=[c for c in nominal_cols if c in df.columns])
 
-        # 6. Clean Up Extra UI Fields: 
-        # The React frontend has fields (like Loan_History = 'Good') that weren't in your CSV.
-        # We must drop them so they don't cause "could not convert string to float" errors.
-        ui_only_fields = ['Loan_History', 'Bank_Account_History', 'Transaction_Frequency', 'Default_Risk']
-        df = df.drop(columns=[col for col in ui_only_fields if col in df.columns], errors='ignore')
-
-        # 7. Column Alignment: The model expects the exact dummy columns created during training.
+        # 6. Column Alignment: The model expects the exact dummy columns created during training.
         expected_cols = None
         if hasattr(ml_model, 'feature_names_in_'):
             expected_cols = ml_model.feature_names_in_
@@ -134,13 +128,13 @@ async def predict_loan(application: LoanApplication):
             # We strip out any remaining text columns so it doesn't crash the scaler
             df = df.select_dtypes(exclude=['object'])
 
-        # 8. Feature Scaling (Step 4 in your code)
+        # 7. Feature Scaling (Step 4 in your code)
         X_scaled = scaler.transform(df)
         
-        # 9. Predict using the loaded ML model
+        # 8. Predict using the loaded ML model
         prediction = ml_model.predict(X_scaled)[0]
         
-        # 10. Extract confidence score (using predict_proba)
+        # 9. Extract confidence score (using predict_proba)
         try:
             probabilities = ml_model.predict_proba(X_scaled)[0]
             confidence = f"{round(max(probabilities) * 100, 1)}%"

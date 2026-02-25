@@ -27,13 +27,13 @@ const formSections = [
     icon: <User className="w-5 h-5" style={{ color: HDFC_BLUE }} />,
     fields: [
       { name: 'Applicant_ID', label: 'Applicant ID', type: 'text', placeholder: 'e.g., APP-10023' },
-      { name: 'Gender', label: 'Gender', type: 'select', options: ['Male', 'Female', 'Other'] },
+      { name: 'Gender', label: 'Gender', type: 'select', options: ['Male', 'Female'] },
       { name: 'Age', label: 'Age', type: 'number', placeholder: 'e.g., 34' },
       { name: 'Marital_Status', label: 'Marital Status', type: 'select', options: ['Single', 'Married'] },
       { name: 'Dependents', label: 'Dependents', type: 'number', placeholder: 'e.g., 2' },
-      { name: 'Education', label: 'Education', type: 'select', options: ['Graduate', 'Not Graduate'] },
-      { name: 'City_Town', label: 'City/Town', type: 'text', placeholder: 'e.g., Mumbai' },
-      { name: 'Residential_Status', label: 'Residential Status', type: 'select', options: ['Owned', 'Rented', 'Mortgage'] },
+      { name: 'Education', label: 'Education', type: 'select', options: ['High School', 'Graduate', 'Postgraduate'] },
+      { name: 'City_Town', label: 'City/Town', type: 'select', options: ['Urban', 'Suburban', 'Rural'] },
+      { name: 'Residential_Status', label: 'Residential Status', type: 'select', options: ['Own', 'Rented', 'Mortgage'] },
     ]
   },
   {
@@ -42,7 +42,7 @@ const formSections = [
     icon: <Briefcase className="w-5 h-5" style={{ color: HDFC_BLUE }} />,
     fields: [
       { name: 'Employment_Status', label: 'Employment Status', type: 'select', options: ['Employed', 'Self-Employed', 'Unemployed'] },
-      { name: 'Occupation_Type', label: 'Occupation Type', type: 'select', options: ['Salaried', 'Business', 'Others'] },
+      { name: 'Occupation_Type', label: 'Occupation Type', type: 'select', options: ['Salaried', 'Business', 'Freelancer'] },
       { name: 'Annual_Income', label: 'Annual Income (₹)', type: 'number', placeholder: 'e.g., 1200000' },
       { name: 'Monthly_Expenses', label: 'Monthly Expenses (₹)', type: 'number', placeholder: 'e.g., 40000' },
     ]
@@ -56,7 +56,7 @@ const formSections = [
       { name: 'Existing_Loans', label: 'Existing Loans (Count)', type: 'number', placeholder: 'e.g., 1' },
       { name: 'Total_Existing_Loan_Amount', label: 'Total Existing Loan Amt (₹)', type: 'number', placeholder: 'e.g., 500000' },
       { name: 'Outstanding_Debt', label: 'Outstanding Debt (₹)', type: 'number', placeholder: 'e.g., 250000' },
-      { name: 'Loan_History', label: 'Previous Loan History', type: 'select', options: ['Good', 'Bad', 'No History'] },
+      { name: 'Loan_History', label: 'Previous Loan History', type: 'select', options: ['1', '0'] },
     ]
   },
   {
@@ -66,8 +66,8 @@ const formSections = [
     fields: [
       { name: 'Loan_Amount_Requested', label: 'Loan Amount Requested (₹)', type: 'number', placeholder: 'e.g., 2000000' },
       { name: 'Loan_Term', label: 'Loan Term (Months)', type: 'number', placeholder: 'e.g., 60' },
-      { name: 'Loan_Purpose', label: 'Loan Purpose', type: 'select', options: ['Home', 'Car', 'Education', 'Personal', 'Business'] },
-      { name: 'Interest_Rate', label: 'Proposed Interest Rate (%)', type: 'number', placeholder: 'e.g., 8.5' },
+      { name: 'Loan_Purpose', label: 'Loan Purpose', type: 'select', options: ['Home', 'Vehicle', 'Personal', 'Education'] },
+      { name: 'Interest_Rate', label: 'Proposed Interest Rate (%)', type: 'number', step: '0.01', placeholder: 'e.g., 8.5' },
       { name: 'Loan_Type', label: 'Loan Type', type: 'select', options: ['Secured', 'Unsecured'] },
       { name: 'Co_Applicant', label: 'Co-Applicant Included', type: 'select', options: ['No', 'Yes'] },
     ]
@@ -77,9 +77,9 @@ const formSections = [
     title: 'Banking & Risk Profile',
     icon: <ShieldAlert className="w-5 h-5" style={{ color: HDFC_BLUE }} />,
     fields: [
-      { name: 'Bank_Account_History', label: 'Bank Account History', type: 'select', options: ['Excellent', 'Good', 'Average', 'Poor'] },
-      { name: 'Transaction_Frequency', label: 'Transaction Frequency', type: 'select', options: ['High', 'Medium', 'Low'] },
-      { name: 'Default_Risk', label: 'Calculated Default Risk', type: 'select', options: ['Low', 'Medium', 'High'] },
+      { name: 'Bank_Account_History', label: 'Bank Account History', type: 'number', placeholder: 'e.g., 8' },
+      { name: 'Transaction_Frequency', label: 'Transaction Frequency', type: 'number', placeholder: 'e.g., 20' },
+      { name: 'Default_Risk', label: 'Calculated Default Risk', type: 'number', step: '0.01', placeholder: 'e.g., 0.17' },
     ]
   }
 ];
@@ -138,46 +138,44 @@ export default function App() {
     const randomOptions = {
       Gender: ['Male', 'Female'],
       Marital_Status: ['Single', 'Married'],
-      Education: ['Graduate', 'Not Graduate'],
-      Residential_Status: ['Owned', 'Rented', 'Mortgage'],
-      Employment_Status: ['Employed', 'Self-Employed'],
-      Occupation_Type: ['Salaried', 'Business'],
-      Loan_History: ['Good', 'Bad', 'No History'],
-      Loan_Purpose: ['Home', 'Car', 'Personal'],
+      Education: ['High School', 'Graduate', 'Postgraduate'],
+      Residential_Status: ['Own', 'Rented', 'Mortgage'],
+      Employment_Status: ['Employed', 'Self-Employed', 'Unemployed'],
+      Occupation_Type: ['Salaried', 'Business', 'Freelancer'],
+      City_Town: ['Urban', 'Suburban', 'Rural'],
+      Loan_History: ['1', '0'],
+      Loan_Purpose: ['Home', 'Vehicle', 'Personal', 'Education'],
       Loan_Type: ['Secured', 'Unsecured'],
       Co_Applicant: ['No', 'Yes'],
-      Bank_Account_History: ['Excellent', 'Good', 'Average'],
-      Transaction_Frequency: ['High', 'Medium'],
-      Default_Risk: ['Low', 'Medium'],
     };
 
     const data = {
       Applicant_ID: `APP-${Math.floor(Math.random() * 90000) + 10000}`,
-      Gender: randomOptions.Gender[Math.floor(Math.random() * 2)],
+      Gender: randomOptions.Gender[Math.floor(Math.random() * randomOptions.Gender.length)],
       Age: Math.floor(Math.random() * 40) + 22,
-      Marital_Status: randomOptions.Marital_Status[Math.floor(Math.random() * 2)],
+      Marital_Status: randomOptions.Marital_Status[Math.floor(Math.random() * randomOptions.Marital_Status.length)],
       Dependents: Math.floor(Math.random() * 4),
-      Education: randomOptions.Education[Math.floor(Math.random() * 2)],
-      City_Town: ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Pune'][Math.floor(Math.random() * 5)],
-      Residential_Status: randomOptions.Residential_Status[Math.floor(Math.random() * 3)],
-      Employment_Status: randomOptions.Employment_Status[Math.floor(Math.random() * 2)],
-      Occupation_Type: randomOptions.Occupation_Type[Math.floor(Math.random() * 2)],
+      Education: randomOptions.Education[Math.floor(Math.random() * randomOptions.Education.length)],
+      City_Town: randomOptions.City_Town[Math.floor(Math.random() * randomOptions.City_Town.length)],
+      Residential_Status: randomOptions.Residential_Status[Math.floor(Math.random() * randomOptions.Residential_Status.length)],
+      Employment_Status: randomOptions.Employment_Status[Math.floor(Math.random() * randomOptions.Employment_Status.length)],
+      Occupation_Type: randomOptions.Occupation_Type[Math.floor(Math.random() * randomOptions.Occupation_Type.length)],
       Annual_Income: (Math.floor(Math.random() * 20) + 5) * 100000,
       Monthly_Expenses: (Math.floor(Math.random() * 50) + 20) * 1000,
       Credit_Score: Math.floor(Math.random() * 300) + 550,
       Existing_Loans: Math.floor(Math.random() * 3),
       Total_Existing_Loan_Amount: Math.floor(Math.random() * 10) * 100000,
       Outstanding_Debt: Math.floor(Math.random() * 5) * 100000,
-      Loan_History: randomOptions.Loan_History[Math.floor(Math.random() * 3)],
+      Loan_History: randomOptions.Loan_History[Math.floor(Math.random() * randomOptions.Loan_History.length)],
       Loan_Amount_Requested: (Math.floor(Math.random() * 50) + 5) * 100000,
       Loan_Term: [12, 24, 36, 48, 60][Math.floor(Math.random() * 5)],
-      Loan_Purpose: randomOptions.Loan_Purpose[Math.floor(Math.random() * 3)],
-      Interest_Rate: parseFloat((Math.random() * 5 + 7).toFixed(1)),
-      Loan_Type: randomOptions.Loan_Type[Math.floor(Math.random() * 2)],
-      Co_Applicant: randomOptions.Co_Applicant[Math.floor(Math.random() * 2)],
-      Bank_Account_History: randomOptions.Bank_Account_History[Math.floor(Math.random() * 3)],
-      Transaction_Frequency: randomOptions.Transaction_Frequency[Math.floor(Math.random() * 2)],
-      Default_Risk: randomOptions.Default_Risk[Math.floor(Math.random() * 2)],
+      Loan_Purpose: randomOptions.Loan_Purpose[Math.floor(Math.random() * randomOptions.Loan_Purpose.length)],
+      Interest_Rate: parseFloat((Math.random() * 5 + 7).toFixed(2)),
+      Loan_Type: randomOptions.Loan_Type[Math.floor(Math.random() * randomOptions.Loan_Type.length)],
+      Co_Applicant: randomOptions.Co_Applicant[Math.floor(Math.random() * randomOptions.Co_Applicant.length)],
+      Bank_Account_History: Math.floor(Math.random() * 15),
+      Transaction_Frequency: Math.floor(Math.random() * 30),
+      Default_Risk: parseFloat(Math.random().toFixed(2)),
     };
     
     setFormData(data);
@@ -286,6 +284,7 @@ export default function App() {
                               placeholder={field.placeholder}
                               value={formData[field.name] ?? ''}
                               onChange={handleInputChange}
+                              step={field.step}
                               className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#004c8f]/20 focus:border-[#004c8f] transition-shadow placeholder:text-slate-300"
                               required
                             />
