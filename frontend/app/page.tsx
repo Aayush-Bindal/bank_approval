@@ -94,53 +94,39 @@ export default function App() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsEvaluating(true);
     setResult(null);
 
-    // Simulate AI model latency (1.5 seconds)
-    setTimeout(() => {
-      // Mock AI Evaluation Logic based on a few key factors
-      const creditScore = parseInt(formData.Credit_Score) || 0;
-      const requestedAmt = parseInt(formData.Loan_Amount_Requested) || 0;
-      const income = parseInt(formData.Annual_Income) || 0;
-      
-      let isApproved = true;
-      let confidence = Math.floor(Math.random() * 15) + 80; // 80-95%
-      let reasons = [];
-
-      if (creditScore < 650) {
-        isApproved = false;
-        reasons.push("Credit score is below the acceptable threshold (650).");
-      }
-      if (requestedAmt > income * 5) {
-        isApproved = false;
-        reasons.push("Requested loan amount exceeds the debt-to-income limits.");
-      }
-      if (formData.Default_Risk === 'High') {
-        isApproved = false;
-        reasons.push("System flagged a high baseline default risk.");
-      }
-      if (formData.Loan_History === 'Bad') {
-        isApproved = false;
-        reasons.push("Applicant has a poor previous loan repayment history.");
-      }
-
-      if (isApproved) {
-        reasons.push("Credit score and income levels meet standard requirements.");
-        if (formData.Employment_Status === 'Employed') reasons.push("Stable employment status confirmed.");
-      } else {
-        confidence = Math.floor(Math.random() * 20) + 70; // 70-90% confident in rejection
-      }
-
-      setResult({
-        status: isApproved ? 'Approved' : 'Rejected',
-        confidence: `${confidence}%`,
-        reasons: reasons
+    try {
+      // Make real API call to your FastAPI backend
+      const response = await fetch('http://localhost:5000/predict', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // Send the exact form data JSON over to the Python server
+        body: JSON.stringify(formData)
       });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || `Server error: ${response.status}`);
+      }
+
+      // Read the response from Python
+      const aiPrediction = await response.json();
+      
+      // Update UI with the result (status, confidence, reasons)
+      setResult(aiPrediction);
+
+    } catch (error) {
+      console.error("Prediction Error:", error);
+      alert(`Failed to connect to the AI model: ${error.message}\nMake sure your FastAPI server is running on port 5000!`);
+    } finally {
       setIsEvaluating(false);
-    }, 1500);
+    }
   };
 
   const resetForm = () => {
@@ -186,7 +172,7 @@ export default function App() {
       Loan_Amount_Requested: (Math.floor(Math.random() * 50) + 5) * 100000,
       Loan_Term: [12, 24, 36, 48, 60][Math.floor(Math.random() * 5)],
       Loan_Purpose: randomOptions.Loan_Purpose[Math.floor(Math.random() * 3)],
-      Interest_Rate: (Math.random() * 5 + 7).toFixed(1),
+      Interest_Rate: parseFloat((Math.random() * 5 + 7).toFixed(1)),
       Loan_Type: randomOptions.Loan_Type[Math.floor(Math.random() * 2)],
       Co_Applicant: randomOptions.Co_Applicant[Math.floor(Math.random() * 2)],
       Bank_Account_History: randomOptions.Bank_Account_History[Math.floor(Math.random() * 3)],
@@ -363,7 +349,7 @@ export default function App() {
                   <div>
                     <h4 className="text-sm font-semibold text-slate-800 mb-3 uppercase tracking-wider">Key Determining Factors</h4>
                     <ul className="space-y-3">
-                      {result.reasons.map((reason, idx) => (
+                      {result.reasons && result.reasons.map((reason, idx) => (
                         <li key={idx} className="flex items-start text-sm text-slate-600">
                           <span className={`mr-2 mt-0.5 w-1.5 h-1.5 rounded-full flex-shrink-0 ${result.status === 'Approved' ? 'bg-emerald-500' : 'bg-red-500'}`}></span>
                           {reason}
@@ -375,7 +361,7 @@ export default function App() {
                   <div className="pt-4 border-t border-gray-100">
                     <div className="bg-slate-50 rounded-lg p-4 border border-slate-100">
                       <p className="text-xs text-slate-500 mb-2">Internal Reference ID</p>
-                      <p className="font-mono text-sm font-medium text-slate-700">
+                      <p className="font-mono text-sm fonta-medium text-slate-700">
                         {formData.Applicant_ID || `EVAL-${Math.floor(Math.random() * 90000) + 10000}`}
                       </p>
                     </div>

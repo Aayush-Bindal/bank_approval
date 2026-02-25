@@ -114,20 +114,33 @@ async def predict_loan(application: LoanApplication):
         nominal_cols = ['Employment_Status', 'Occupation_Type', 'Residential_Status', 'City/Town', 'Loan_Purpose']
         df = pd.get_dummies(df, columns=[c for c in nominal_cols if c in df.columns])
 
-        # 6. Column Alignment: The model expects the exact dummy columns created during training.
+        # 6. Clean Up Extra UI Fields: 
+        # The React frontend has fields (like Loan_History = 'Good') that weren't in your CSV.
+        # We must drop them so they don't cause "could not convert string to float" errors.
+        ui_only_fields = ['Loan_History', 'Bank_Account_History', 'Transaction_Frequency', 'Default_Risk']
+        df = df.drop(columns=[col for col in ui_only_fields if col in df.columns], errors='ignore')
+
+        # 7. Column Alignment: The model expects the exact dummy columns created during training.
+        expected_cols = None
         if hasattr(ml_model, 'feature_names_in_'):
             expected_cols = ml_model.feature_names_in_
+        elif hasattr(scaler, 'feature_names_in_'):
+            expected_cols = scaler.feature_names_in_
+            
+        if expected_cols is not None:
             df = df.reindex(columns=expected_cols, fill_value=0)
         else:
-            raise ValueError("Model missing 'feature_names_in_'. Ensure it was trained with Pandas DataFrames.")
+            # Failsafe if feature_names_in_ is missing (older scikit-learn versions)
+            # We strip out any remaining text columns so it doesn't crash the scaler
+            df = df.select_dtypes(exclude=['object'])
 
-        # 7. Feature Scaling (Step 4 in your code)
+        # 8. Feature Scaling (Step 4 in your code)
         X_scaled = scaler.transform(df)
         
-        # 8. Predict using the loaded ML model
+        # 9. Predict using the loaded ML model
         prediction = ml_model.predict(X_scaled)[0]
         
-        # 9. Extract confidence score (using predict_proba)
+        # 10. Extract confidence score (using predict_proba)
         try:
             probabilities = ml_model.predict_proba(X_scaled)[0]
             confidence = f"{round(max(probabilities) * 100, 1)}%"
