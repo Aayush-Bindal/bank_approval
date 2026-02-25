@@ -135,52 +135,78 @@ export default function App() {
   };
 
   const generateRandomData = () => {
-    const randomOptions = {
-      Gender: ['Male', 'Female'],
-      Marital_Status: ['Single', 'Married'],
-      Education: ['High School', 'Graduate', 'Postgraduate'],
-      Residential_Status: ['Own', 'Rented', 'Mortgage'],
-      Employment_Status: ['Employed', 'Self-Employed', 'Unemployed'],
-      Occupation_Type: ['Salaried', 'Business', 'Freelancer'],
-      City_Town: ['Urban', 'Suburban', 'Rural'],
-      Loan_History: ['1', '0'],
-      Loan_Purpose: ['Home', 'Vehicle', 'Personal', 'Education'],
-      Loan_Type: ['Secured', 'Unsecured'],
-      Co_Applicant: ['No', 'Yes'],
-    };
+  const isStrongProfile = Math.random() > 0.5; // 50% good applicants
 
-    const data = {
-      Applicant_ID: `APP-${Math.floor(Math.random() * 90000) + 10000}`,
-      Gender: randomOptions.Gender[Math.floor(Math.random() * randomOptions.Gender.length)],
-      Age: Math.floor(Math.random() * 40) + 22,
-      Marital_Status: randomOptions.Marital_Status[Math.floor(Math.random() * randomOptions.Marital_Status.length)],
-      Dependents: Math.floor(Math.random() * 4),
-      Education: randomOptions.Education[Math.floor(Math.random() * randomOptions.Education.length)],
-      City_Town: randomOptions.City_Town[Math.floor(Math.random() * randomOptions.City_Town.length)],
-      Residential_Status: randomOptions.Residential_Status[Math.floor(Math.random() * randomOptions.Residential_Status.length)],
-      Employment_Status: randomOptions.Employment_Status[Math.floor(Math.random() * randomOptions.Employment_Status.length)],
-      Occupation_Type: randomOptions.Occupation_Type[Math.floor(Math.random() * randomOptions.Occupation_Type.length)],
-      Annual_Income: (Math.floor(Math.random() * 20) + 5) * 100000,
-      Monthly_Expenses: (Math.floor(Math.random() * 50) + 20) * 1000,
-      Credit_Score: Math.floor(Math.random() * 300) + 550,
-      Existing_Loans: Math.floor(Math.random() * 3),
-      Total_Existing_Loan_Amount: Math.floor(Math.random() * 10) * 100000,
-      Outstanding_Debt: Math.floor(Math.random() * 5) * 100000,
-      Loan_History: randomOptions.Loan_History[Math.floor(Math.random() * randomOptions.Loan_History.length)],
-      Loan_Amount_Requested: (Math.floor(Math.random() * 50) + 5) * 100000,
-      Loan_Term: [12, 24, 36, 48, 60][Math.floor(Math.random() * 5)],
-      Loan_Purpose: randomOptions.Loan_Purpose[Math.floor(Math.random() * randomOptions.Loan_Purpose.length)],
-      Interest_Rate: parseFloat((Math.random() * 5 + 7).toFixed(2)),
-      Loan_Type: randomOptions.Loan_Type[Math.floor(Math.random() * randomOptions.Loan_Type.length)],
-      Co_Applicant: randomOptions.Co_Applicant[Math.floor(Math.random() * randomOptions.Co_Applicant.length)],
-      Bank_Account_History: Math.floor(Math.random() * 15),
-      Transaction_Frequency: Math.floor(Math.random() * 30),
-      Default_Risk: parseFloat(Math.random().toFixed(2)),
-    };
-    
-    setFormData(data);
-    setResult(null);
+  const randomOptions = {
+    Gender: ['Male', 'Female'],
+    Marital_Status: ['Single', 'Married'],
+    Education: ['High School', 'Graduate', 'Postgraduate'],
+    Residential_Status: ['Own', 'Rented', 'Mortgage'],
+    Employment_Status: ['Employed', 'Self-Employed'],
+    Occupation_Type: ['Salaried', 'Business', 'Freelancer'],
+    City_Town: ['Urban', 'Suburban', 'Rural'],
+    Loan_Purpose: ['Home', 'Vehicle', 'Personal', 'Education'],
+    Loan_Type: ['Secured', 'Unsecured'],
+    Co_Applicant: ['No', 'Yes'],
   };
+
+  const data = {
+    Applicant_ID: `APP-${Math.floor(Math.random() * 90000) + 10000}`,
+    Gender: randomOptions.Gender[Math.floor(Math.random() * 2)],
+    Age: Math.floor(Math.random() * 30) + 25,
+    Marital_Status: randomOptions.Marital_Status[Math.floor(Math.random() * 2)],
+    Dependents: Math.floor(Math.random() * 3),
+    Education: isStrongProfile ? 'Graduate' : 'High School',
+    City_Town: 'Urban',
+    Residential_Status: isStrongProfile ? 'Own' : 'Rented',
+    Employment_Status: isStrongProfile ? 'Employed' : 'Self-Employed',
+    Occupation_Type: randomOptions.Occupation_Type[Math.floor(Math.random() * 3)],
+
+    // 💰 Income Logic
+    Annual_Income: isStrongProfile
+      ? (Math.floor(Math.random() * 10) + 15) * 100000  // 15–25 lakh
+      : (Math.floor(Math.random() * 5) + 4) * 100000,  // 4–9 lakh
+
+    Monthly_Expenses: isStrongProfile
+      ? (Math.floor(Math.random() * 20) + 10) * 1000
+      : (Math.floor(Math.random() * 50) + 30) * 1000,
+
+    Credit_Score: isStrongProfile
+      ? Math.floor(Math.random() * 100) + 700   // 700–800
+      : Math.floor(Math.random() * 150) + 550,  // 550–700
+
+    Existing_Loans: isStrongProfile ? 0 : Math.floor(Math.random() * 3),
+    Total_Existing_Loan_Amount: isStrongProfile ? 0 : Math.floor(Math.random() * 5) * 100000,
+    Outstanding_Debt: isStrongProfile ? 0 : Math.floor(Math.random() * 5) * 100000,
+
+    Loan_History: isStrongProfile ? '1' : '0',
+
+    Loan_Amount_Requested: isStrongProfile
+      ? (Math.floor(Math.random() * 10) + 5) * 100000
+      : (Math.floor(Math.random() * 40) + 20) * 100000,
+
+    Loan_Term: [24, 36, 48][Math.floor(Math.random() * 3)],
+    Loan_Purpose: randomOptions.Loan_Purpose[Math.floor(Math.random() * 4)],
+    Interest_Rate: isStrongProfile ? 8.5 : 11.5,
+    Loan_Type: isStrongProfile ? 'Secured' : 'Unsecured',
+    Co_Applicant: isStrongProfile ? 'Yes' : 'No',
+
+    Bank_Account_History: isStrongProfile
+      ? Math.floor(Math.random() * 10) + 5
+      : Math.floor(Math.random() * 5),
+
+    Transaction_Frequency: isStrongProfile
+      ? Math.floor(Math.random() * 20) + 10
+      : Math.floor(Math.random() * 10),
+
+    Default_Risk: isStrongProfile
+      ? parseFloat((Math.random() * 0.3).toFixed(2))
+      : parseFloat((Math.random() * 0.7 + 0.3).toFixed(2)),
+  };
+
+  setFormData(data);
+  setResult(null);
+};
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800 flex flex-col">
