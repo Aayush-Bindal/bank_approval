@@ -1,16 +1,15 @@
+from pathlib import Path
+
+import joblib
+import pandas as pd
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import joblib
-import pandas as pd
-import os
-import numpy as np
 
 app = FastAPI(title="HDFC AI Loan Decision API")
 
-# Load the model on startup (Place your .pkl files in the same backend folder)
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "model.pkl")
-SCALER_PATH = os.path.join(os.path.dirname(__file__), "scaler.pkl")
+MODEL_PATH = Path(__file__).parent / "model.pkl"
+SCALER_PATH = Path(__file__).parent / "scaler.pkl"
 
 try:
     ml_model = joblib.load(MODEL_PATH)
